@@ -1,7 +1,8 @@
 import React, { useMemo } from "react";
 import { Link, useParams } from "react-router-dom";
 import { CAMPUSES, findDepartment } from "../data/campuses";
-import { deptEntity, docsFor, examsFor } from "../data/resources";
+import { deptEntity } from "../data/resources";
+import { useContent } from "../data/content";
 import { Breadcrumbs, EmptyState } from "../components/ui";
 import ResourceHub from "../components/ResourceHub";
 import { IArrowR, IBook, IExam, IDoc } from "../components/icons";
@@ -21,8 +22,10 @@ export default function DepartmentPage() {
     );
   }
 
-  const exams = examsFor(entity).length;
-  const docs = docsFor(entity).length;
+  const content = useContent();
+  const exams = content.examsFor(entity.id).length;
+  const docs = content.docsFor(entity.id).length;
+  const photos = content.photosFor(entity.id).length;
 
   return (
     <div className="max-w-7xl mx-auto px-4">
@@ -41,7 +44,7 @@ export default function DepartmentPage() {
           <div className="flex flex-wrap items-center gap-4 mt-5 font-mono text-[0.74rem] text-inksoft dark:text-pine-200/60">
             <span className="flex items-center gap-1.5"><IExam size={14} className="text-pine-600 dark:text-gold-400" /> {exams} exam papers</span>
             <span className="flex items-center gap-1.5"><IDoc size={14} className="text-pine-600 dark:text-gold-400" /> {docs} documents</span>
-            <span className="flex items-center gap-1.5"><IBook size={14} className="text-pine-600 dark:text-gold-400" /> {entity.topics.length} core areas</span>
+            <span className="flex items-center gap-1.5"><IBook size={14} className="text-pine-600 dark:text-gold-400" /> {photos} photos</span>
           </div>
           <div className="flex flex-wrap gap-2 mt-5">
             <Link to={`/explained/${dep.id}`} className="btn-primary !py-2">Read “{dep.name} Explained” <IArrowR size={15} /></Link>

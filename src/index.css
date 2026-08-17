@@ -154,6 +154,12 @@ input, textarea, select { outline: none; }
 .dark .btn-ghost { border-color: rgba(131,185,161,0.28); color: #e6efe8; }
 .dark .btn-ghost:hover { background: rgba(79,152,121,0.14); border-color: rgba(131,185,161,0.5); }
 
+.lbl {
+  display: block; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.02em;
+  color: var(--color-inksoft); margin-bottom: 0.3rem;
+}
+.dark .lbl { color: rgba(230, 239, 232, 0.6); }
+
 .chip {
   display: inline-flex; align-items: center; gap: 0.35rem; border-radius: 999px;
   border: 1px solid rgba(14,90,69,0.22); padding: 0.22rem 0.7rem; font-size: 0.74rem; font-weight: 600;

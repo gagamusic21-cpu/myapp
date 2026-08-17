@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useStore } from "../lib/store";
-import { getSearchIndex, SearchEntry } from "../data/resources";
+import { useSearchIndex, SearchEntry } from "../data/content";
 import { IBook, ICap, IChevD, IDoc, IExam, IGrid, IPin, ISearch, IX } from "./icons";
 
 const CATS = ["All", "Campus", "Subject", "Department", "Course", "Exam", "Document", "Explained"] as const;
@@ -17,7 +17,8 @@ export default function SearchOverlay() {
   const [cursor, setCursor] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const nav = useNavigate();
-  const index = useMemo(() => (searchOpen ? getSearchIndex() : []), [searchOpen]);
+  const searchIndex = useSearchIndex();
+  const index = useMemo(() => (searchOpen ? searchIndex : []), [searchOpen, searchIndex]);
 
   useEffect(() => {
     if (searchOpen) { setQ(""); setCat("All"); setCursor(0); setTimeout(() => inputRef.current?.focus(), 60); }

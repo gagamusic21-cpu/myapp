@@ -1,7 +1,8 @@
 import React, { useMemo } from "react";
 import { Link, useParams } from "react-router-dom";
 import { FRESHMAN_LOOKUP } from "../data/campuses";
-import { subjectEntity, examsFor, docsFor } from "../data/resources";
+import { subjectEntity } from "../data/resources";
+import { useContent } from "../data/content";
 import { Breadcrumbs, EmptyState } from "../components/ui";
 import ResourceHub from "../components/ResourceHub";
 import { IArrowR, IBook, IExam, IDoc } from "../components/icons";
@@ -10,6 +11,7 @@ export default function SubjectPage() {
   const { subjectId = "" } = useParams();
   const subject = FRESHMAN_LOOKUP.get(subjectId);
   const entity = useMemo(() => (subject ? subjectEntity(subject) : null), [subject]);
+  const content = useContent();
 
   if (!subject || !entity) {
     return (
@@ -35,8 +37,8 @@ export default function SubjectPage() {
           <p className="text-[1rem] text-inksoft dark:text-pine-200/75 mt-1.5">{subject.tagline}</p>
           <p className="text-[0.88rem] text-inksoft dark:text-pine-200/65 mt-3 max-w-2xl leading-relaxed">{subject.overview}</p>
           <div className="flex flex-wrap items-center gap-4 mt-5 font-mono text-[0.74rem] text-inksoft dark:text-pine-200/60">
-            <span className="flex items-center gap-1.5"><IExam size={14} className="text-pine-600 dark:text-gold-400" /> {examsFor(entity).length} exam papers</span>
-            <span className="flex items-center gap-1.5"><IDoc size={14} className="text-pine-600 dark:text-gold-400" /> {docsFor(entity).length} documents</span>
+            <span className="flex items-center gap-1.5"><IExam size={14} className="text-pine-600 dark:text-gold-400" /> {content.examsFor(entity.id).length} exam papers</span>
+            <span className="flex items-center gap-1.5"><IDoc size={14} className="text-pine-600 dark:text-gold-400" /> {content.docsFor(entity.id).length} documents</span>
             <span className="flex items-center gap-1.5"><IBook size={14} className="text-pine-600 dark:text-gold-400" /> {subject.topics.length} units</span>
           </div>
           <div className="flex flex-wrap gap-1.5 mt-4">

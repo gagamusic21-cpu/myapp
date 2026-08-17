@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { HashRouter, Route, Routes, useLocation } from "react-router-dom";
 import { StoreProvider } from "./lib/store";
+import { ContentProvider } from "./data/content";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import SearchOverlay from "./components/SearchOverlay";
@@ -49,9 +50,11 @@ function Shell() {
 export default function App() {
   return (
     <StoreProvider>
-      <HashRouter>
-        <Shell />
-      </HashRouter>
+      <ContentProvider>
+        <HashRouter>
+          <Shell />
+        </HashRouter>
+      </ContentProvider>
     </StoreProvider>
   );
 }

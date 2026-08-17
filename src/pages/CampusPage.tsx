@@ -2,7 +2,7 @@ import React, { useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { CAMPUSES, departmentsOf } from "../data/campuses";
 import { FRESHMAN_SUBJECTS } from "../data/freshman";
-import { deptEntity, docsFor, examsFor, subjectEntity } from "../data/resources";
+import { useContent } from "../data/content";
 import { Breadcrumbs, EmptyState, Reveal } from "../components/ui";
 import ChatRoom from "../components/ChatRoom";
 import { IArrowR, ICap, IChat, IChip, IExam, ILeaf, IPulse, ISearch } from "../components/icons";
@@ -15,6 +15,7 @@ export default function CampusPage() {
   const { campusId = "freshman" } = useParams();
   const campus = CAMPUSES.find((c) => c.id === campusId);
   const [q, setQ] = useState("");
+  const content = useContent();
 
   const items = useMemo(() => {
     if (!campus) return [];
@@ -22,19 +23,19 @@ export default function CampusPage() {
       return FRESHMAN_SUBJECTS.map((s) => ({
         id: s.id, name: s.name, code: s.code, tagline: s.tagline,
         to: `/campus/freshman/subject/${s.id}`,
-        exams: examsFor(subjectEntity(s)).length,
-        docs: docsFor(subjectEntity(s)).length,
+        exams: content.examsFor(s.id).length,
+        docs: content.docsFor(s.id).length,
         img: s.image,
       }));
     }
     return departmentsOf(campus.id).map((d) => ({
       id: d.id, name: d.name, code: d.abbr, tagline: d.tagline,
       to: `/campus/${campus.id}/dept/${d.id}`,
-      exams: examsFor(deptEntity(d)).length,
-      docs: docsFor(deptEntity(d)).length,
+      exams: content.examsFor(d.id).length,
+      docs: content.docsFor(d.id).length,
       img: d.images[0],
     }));
-  }, [campus]);
+  }, [campus, content]);
 
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();

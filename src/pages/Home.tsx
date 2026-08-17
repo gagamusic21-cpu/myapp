@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { CAMPUSES, DEPARTMENTS, departmentsOf } from "../data/campuses";
 import { FRESHMAN_SUBJECTS } from "../data/freshman";
-import { platformStats } from "../data/resources";
+import { useContent } from "../data/content";
 import { useStore } from "../lib/store";
 import { Reveal, SectionHead } from "../components/ui";
 import AdBoard from "../components/AdBoard";
@@ -52,7 +52,12 @@ function Ticker({ items }: { items: string[] }) {
 
 export default function Home() {
   const { announcements, setSearchOpen } = useStore();
-  const stats = useMemo(() => platformStats(), []);
+  const content = useContent();
+  const stats = content.stats;
+  const isEmpty = stats.exams + stats.docs + stats.courses + stats.photos === 0;
+  const tickerItems = content.recent.length
+    ? content.recent.map((r) => `${r.entity} — ${r.label} (${r.kind})`)
+    : ["This archive is ready for your content — open the Staff dashboard to add the first exam, photo or note."];
   const explainedSample = useMemo(() => {
     const want = ["computer-science", "medicine", "plant-science", "civil-engineering", "pharmacy", "animal-science", "medical-laboratory-science", "urban-planning-design"];
     return want.map((id) => DEPARTMENTS.find((d) => d.id === id)!);
@@ -61,6 +66,21 @@ export default function Home() {
   return (
     <div>
       <AdBoard />
+
+      {isEmpty && (
+        <div className="max-w-7xl mx-auto px-4 mt-6">
+          <div className="rounded-xl border-2 border-dashed border-gold-500/60 bg-gold-400/12 px-5 py-4 flex flex-col sm:flex-row sm:items-center gap-3">
+            <span className="text-gold-600 dark:text-gold-400 shrink-0"><ISpark size={22} /></span>
+            <div className="flex-1">
+              <p className="font-display font-bold text-[0.98rem]">You're the curator — this archive is waiting for your content.</p>
+              <p className="text-[0.82rem] text-inksoft dark:text-pine-200/70 mt-0.5">
+                Nothing here is pre-filled. Add your own exams, answer sheets, photos, notes and courses — they publish instantly for every student.
+              </p>
+            </div>
+            <Link to="/admin" className="btn-gold shrink-0">Open Staff dashboard</Link>
+          </div>
+        </div>
+      )}
 
       {/* ============ opening board ============ */}
       <section className="relative overflow-hidden">
@@ -88,16 +108,16 @@ export default function Home() {
             <button onClick={() => setSearchOpen(true)}
               className="mt-7 w-full max-w-xl flex items-center gap-3 card-surface rounded-xl px-4 py-3.5 text-left shadow-[0_14px_40px_-18px_rgba(9,58,46,0.5)] hover:shadow-[0_18px_50px_-18px_rgba(9,58,46,0.65)] hover:-translate-y-0.5 transition-all group">
               <span className="text-pine-600 dark:text-gold-400 group-hover:scale-110 transition-transform"><ISearch size={21} /></span>
-              <span className="text-[0.95rem] text-inksoft dark:text-pine-200/60">Search “Mathematics 2016 final”, “CoSc exit exam”, “Anatomy notes”…</span>
+              <span className="text-[0.95rem] text-inksoft dark:text-pine-200/60">Search departments, subjects, courses, exams, notes…</span>
               <kbd className="ml-auto hidden sm:block font-mono text-[0.66rem] px-2 py-1 rounded border hairline bg-pine-600/5 dark:bg-pine-500/10">Ctrl K</kbd>
             </button>
 
             <div className="flex flex-wrap gap-2 mt-4">
               {[
-                { l: "Mathematics past papers", to: "/campus/freshman/subject/mathematics?tab=exams" },
-                { l: "CoSc model exit exams", to: "/campus/iot/dept/computer-science?tab=exams" },
-                { l: "Anatomy answer keys", to: "/campus/health/dept/medicine?tab=answers" },
-                { l: "Agronomy notes", to: "/campus/agri/dept/plant-science?tab=notes" },
+                { l: "Freshman → Mathematics", to: "/campus/freshman/subject/mathematics" },
+                { l: "IoT → Computer Science", to: "/campus/iot/dept/computer-science" },
+                { l: "Health → Medicine", to: "/campus/health/dept/medicine" },
+                { l: "Agricultural → Plant Science", to: "/campus/agri/dept/plant-science" },
               ].map((c) => (
                 <Link key={c.l} to={c.to} className="chip hover:!bg-pine-700 hover:!text-gold-200 hover:!border-pine-700 transition-colors">{c.l} →</Link>
               ))}
@@ -128,15 +148,7 @@ export default function Home() {
               </div>
               <div className="px-5 py-4 border-b hairline">
                 <p className="font-mono text-[0.62rem] uppercase tracking-[0.18em] text-inksoft dark:text-pine-200/50 mb-1.5">Fresh uploads</p>
-                <Ticker items={[
-                  "Mathematics — Final 2016 E.C. with answers",
-                  "Computer Science — Model Exit Exam Set 3",
-                  "Medicine — Clinical procedure checklists",
-                  "Plant Science — Field manual (updated)",
-                  "Physics — Midterm 2017 E.C. paper",
-                  "Nursing — OSCE station guides",
-                  "Logic — Argument drills worksheet",
-                ]} />
+                <Ticker items={tickerItems} />
               </div>
               <div className="p-3 grid grid-cols-2 gap-2.5">
                 {CAMPUSES.map((c) => (
