@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useStore, timeAgo } from "../lib/store";
 import { ChatMessage } from "../data/types";
 import { hash } from "../data/resources";
+import { api } from "../lib/api";
 import { DEPARTMENTS } from "../data/campuses";
 import { IChat, IFlag, IReply, ISearch, ISend, IShield, ITrash, IUser, IX } from "./icons";
 
@@ -32,6 +33,17 @@ export default function ChatRoom({ roomId, roomName, height = "h-[440px]" }: { r
     const el = listRef.current;
     if (el && !filter) el.scrollTop = el.scrollHeight;
   }, [messages.length, filter]);
+
+  /* pull the shared conversation from the server when one is configured */
+  useEffect(() => {
+    if (!api.enabled) return;
+    let alive = true;
+    api.chatFor(roomId)
+      .then((msgs) => { if (alive) store.hydrateFromServer(roomId, msgs); })
+      .catch(() => { /* offline: local conversation only */ });
+    return () => { alive = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [roomId]);
 
   const saveProfile = () => {
     const n = nameInput.trim();

@@ -1,0 +1,20 @@
+# Render blueprint — deploy the API as a Node web service.
+# In Render: New → Blueprint → connect the repo → it picks up this file.
+services:
+  - type: web
+    name: huec-api
+    runtime: node
+    rootDir: server
+    plan: free
+    buildCommand: npm install && npx prisma generate && npx prisma db push
+    startCommand: node src/index.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: DATABASE_URL
+        sync: false # paste your Neon/Supabase connection string in the Render dashboard
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CLIENT_ORIGIN
+        sync: false # set to your deployed Vercel frontend URL
+      - key: STAFF_KEY
+        sync: false

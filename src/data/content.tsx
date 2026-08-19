@@ -1,7 +1,8 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { CampusPhoto, Course, ExamPaper, Question, ResourceDoc } from "./types";
 import { CAMPUSES, DEPARTMENTS } from "./campuses";
 import { FRESHMAN_SUBJECTS } from "./freshman";
+import { api } from "../lib/api";
 
 /* ------------------------------------------------------------------ */
 /* Content items = the platform types + which entity they belong to.  */
@@ -135,6 +136,8 @@ interface ContentShape extends ContentState {
   stats: { exams: number; docs: number; courses: number; photos: number; departments: number };
   recent: { id: string; label: string; kind: string; entity: string; addedAt: number }[];
   storageOk: boolean;
+  /** "server" = hydrated from the REST API · "local" = device storage · "checking" = probing */
+  conn: "checking" | "server" | "local";
 }
 
 const ContentCtx = createContext<ContentShape | null>(null);
@@ -142,24 +145,76 @@ const ContentCtx = createContext<ContentShape | null>(null);
 export function ContentProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<ContentState>(() => ls.get<ContentState>("huec:content", EMPTY));
   const [storageOk, setStorageOk] = useState(true);
+  const [conn, setConn] = useState<"checking" | "server" | "local">("checking");
+  const connRef = useRef(conn);
+  useEffect(() => { connRef.current = conn; }, [conn]);
 
   useEffect(() => { setStorageOk(ls.set("huec:content", state)); }, [state]);
+
+  /* ---- boot: hydrate from the REST API when one is configured & reachable ---- */
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      if (!api.enabled) { setConn("local"); return; }
+      try {
+        await api.ping();
+        const snap = await api.snapshot();
+        if (!alive) return;
+        const ts = (d: string) => Date.parse(d) || Date.now();
+        setState({
+          exams: snap.exams.map(({ entityId, createdAt, ...e }) => ({ ...e, entityKey: entityId, addedAt: ts(createdAt) })),
+          courses: snap.courses.map(({ entityId, createdAt, ...c }) => ({ ...c, entityKey: entityId, addedAt: ts(createdAt) })),
+          docs: snap.documents.map(({ entityId, createdAt, fileName, fileData, ...d }) => ({
+            ...d, entityKey: entityId, addedAt: ts(createdAt),
+            fileName: fileName ?? undefined, fileUrl: fileData ?? undefined,
+          })),
+          photos: snap.photos.map(({ entityId, createdAt, ...p }) => ({ ...p, entityKey: entityId, addedAt: ts(createdAt) })),
+        });
+        setConn("server");
+      } catch {
+        if (alive) setConn("local");
+      }
+    })();
+    return () => { alive = false; };
+  }, []);
+
+  /** Best-effort server write — the local copy is always updated immediately. */
+  const sync = useCallback((fn: () => Promise<unknown>) => {
+    if (connRef.current === "server") void fn().catch(() => { /* local copy remains as fallback */ });
+  }, []);
 
   const examsFor = useCallback((k: string) => state.exams.filter((e) => e.entityKey === k), [state.exams]);
   const photosFor = useCallback((k: string) => state.photos.filter((e) => e.entityKey === k), [state.photos]);
   const docsFor = useCallback((k: string) => state.docs.filter((e) => e.entityKey === k), [state.docs]);
   const coursesFor = useCallback((k: string) => state.courses.filter((e) => e.entityKey === k), [state.courses]);
 
-  const addExam: ContentShape["addExam"] = (e) =>
-    setState((s) => ({ ...s, exams: [{ ...e, id: `ex-${Date.now()}-${Math.floor(Math.random() * 1e4)}`, addedAt: Date.now() }, ...s.exams] }));
-  const addPhotos: ContentShape["addPhotos"] = (photos) =>
-    setState((s) => ({ ...s, photos: [...photos.map((p, i) => ({ ...p, id: `ph-${Date.now()}-${i}`, addedAt: Date.now() + i })), ...s.photos] }));
-  const addDoc: ContentShape["addDoc"] = (d) =>
-    setState((s) => ({ ...s, docs: [{ ...d, id: `dc-${Date.now()}`, addedAt: Date.now() }, ...s.docs] }));
-  const addCourse: ContentShape["addCourse"] = (c) =>
-    setState((s) => ({ ...s, courses: [{ ...c, id: `cr-${Date.now()}`, addedAt: Date.now() }, ...s.courses] }));
-  const removeItem: ContentShape["removeItem"] = (kind, id) =>
+  const addExam: ContentShape["addExam"] = (e) => {
+    const item: ContentExam = { ...e, id: `ex-${Date.now()}-${Math.floor(Math.random() * 1e4)}`, addedAt: Date.now() };
+    setState((s) => ({ ...s, exams: [item, ...s.exams] }));
+    sync(() => api.createExam(item.entityKey, item));
+  };
+  const addPhotos: ContentShape["addPhotos"] = (photos) => {
+    const items: ContentPhoto[] = photos.map((p, i) => ({ ...p, id: `ph-${Date.now()}-${i}`, addedAt: Date.now() + i }));
+    setState((s) => ({ ...s, photos: [...items, ...s.photos] }));
+    items.forEach((p) => sync(() => api.createPhoto(p.entityKey, p)));
+  };
+  const addDoc: ContentShape["addDoc"] = (d) => {
+    const item: ContentDoc = { ...d, id: `dc-${Date.now()}`, addedAt: Date.now() };
+    setState((s) => ({ ...s, docs: [item, ...s.docs] }));
+    // the attached file travels to the server as base64 `fileData`
+    sync(() => api.createDocument(item.entityKey, { ...item, fileData: item.fileUrl }));
+  };
+  const addCourse: ContentShape["addCourse"] = (c) => {
+    const item: ContentCourse = { ...c, id: `cr-${Date.now()}`, addedAt: Date.now() };
+    setState((s) => ({ ...s, courses: [item, ...s.courses] }));
+    sync(() => api.createCourse(item.entityKey, item));
+  };
+  const removeItem: ContentShape["removeItem"] = (kind, id) => {
     setState((s) => ({ ...s, [kind]: (s[kind] as { id: string }[]).filter((x) => x.id !== id) }));
+    const coll = { exams: "exams", photos: "photos", docs: "documents", courses: "courses" }[kind] as
+      | "exams" | "photos" | "documents" | "courses";
+    sync(() => api.remove(coll, id));
+  };
 
   const loadDemo = () => setState(buildDemo());
   const clearAll = () => { setState(EMPTY); ls.del("huec:content"); };
@@ -195,7 +250,7 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
   const value: ContentShape = {
     ...state, examsFor, photosFor, docsFor, coursesFor,
     addExam, addPhotos, addDoc, addCourse, removeItem,
-    loadDemo, clearAll, exportJson, importJson, stats, recent, storageOk,
+    loadDemo, clearAll, exportJson, importJson, stats, recent, storageOk, conn,
   };
   return <ContentCtx.Provider value={value}>{children}</ContentCtx.Provider>;
 }

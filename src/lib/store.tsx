@@ -1,6 +1,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { AdItem, Announcement, ChatMessage } from "../data/types";
 import { DEFAULT_ADS, DEFAULT_ANNOUNCEMENTS, hash } from "../data/resources";
+import { api } from "./api";
 
 /* ---------- helpers ---------- */
 const ls = {
@@ -25,6 +26,7 @@ interface StoreShape {
   sendMessage: (room: string, text: string, replyTo?: ChatMessage["replyTo"]) => void;
   deleteMessage: (room: string, id: string) => void;
   reportMessage: (room: string, id: string) => void;
+  hydrateFromServer: (room: string, msgs: ChatMessage[]) => void;
   announcements: Announcement[];
   addAnnouncement: (a: Omit<Announcement, "id">) => void;
   removeAnnouncement: (id: string) => void;
@@ -79,6 +81,34 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [removedAds, setRemovedAds] = useState<string[]>(() => ls.get<string[]>("huec:ads-rm", []));
   const [searchOpen, setSearchOpen] = useState(false);
   const toastId = useRef(1);
+  const [serverAnn, setServerAnn] = useState<Announcement[]>([]);
+  const [serverAds, setServerAds] = useState<AdItem[]>([]);
+  const reachRef = useRef<boolean | null>(null);
+
+  /** Fire-and-forget server write; only attempted once the API is known to be reachable. */
+  const serverWrite = useCallback((fn: () => Promise<unknown>) => {
+    if (!api.enabled) return;
+    const go = () => void fn().catch(() => { /* local copy remains */ });
+    if (reachRef.current === true) return go();
+    void api.ping()
+      .then(() => { reachRef.current = true; go(); })
+      .catch(() => { reachRef.current = false; });
+  }, []);
+
+  /* boot: pull server-published announcements & ads when an API is configured */
+  useEffect(() => {
+    if (!api.enabled) return;
+    let alive = true;
+    api.snapshot()
+      .then((snap) => {
+        if (!alive) return;
+        setServerAnn(snap.announcements.map(({ createdAt, ...a }) => a));
+        setServerAds(snap.ads.map(({ createdAt, ...a }) => a));
+        reachRef.current = true;
+      })
+      .catch(() => { reachRef.current = false; });
+    return () => { alive = false; };
+  }, []);
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", theme === "dark");
@@ -106,37 +136,62 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     const msg: ChatMessage = { id: `${room}-${Date.now()}`, room, author: who, text, time: Date.now(), replyTo, own: true };
     const cur = ls.get<ChatMessage[] | null>(`huec:chat:${room}`, null) ?? seedRoom(room);
     persist(room, [...cur, msg]);
-  }, [identity]);
+    serverWrite(() => api.postChat(room, msg));
+  }, [identity, serverWrite]);
 
   const deleteMessage = useCallback((room: string, id: string) => {
     const cur = ls.get<ChatMessage[] | null>(`huec:chat:${room}`, null) ?? seedRoom(room);
     persist(room, cur.filter((m) => m.id !== id));
-  }, []);
+    serverWrite(() => api.deleteChat(id));
+  }, [serverWrite]);
 
   const reportMessage = useCallback((room: string, id: string) => {
     const cur = ls.get<ChatMessage[] | null>(`huec:chat:${room}`, null) ?? seedRoom(room);
     persist(room, cur.map((m) => (m.id === id ? { ...m, reported: true } : m)));
+    serverWrite(() => api.reportChat(id));
+  }, [serverWrite]);
+
+  /** Merge server-fetched messages with the local conversation (deduped by id). */
+  const hydrateFromServer = useCallback((room: string, msgs: ChatMessage[]) => {
+    const local = ls.get<ChatMessage[] | null>(`huec:chat:${room}`, null) ?? [];
+    const map = new Map<string, ChatMessage>();
+    [...msgs, ...local].forEach((m) => map.set(m.id, m));
+    persist(room, [...map.values()].sort((a, b) => a.time - b.time));
   }, []);
 
   const setIdentity = useCallback((i: Identity | null) => { setIdentityState(i); if (i) ls.set("huec:user", i); else ls.del("huec:user"); }, []);
 
   const announcements = useMemo(
-    () => [...customAnn, ...DEFAULT_ANNOUNCEMENTS].filter((a) => !removedAnn.includes(a.id)),
-    [customAnn, removedAnn]);
+    () => [...customAnn, ...serverAnn, ...DEFAULT_ANNOUNCEMENTS].filter((a) => !removedAnn.includes(a.id)),
+    [customAnn, serverAnn, removedAnn]);
   const ads = useMemo(
-    () => [...customAds, ...DEFAULT_ADS].filter((a) => !removedAds.includes(a.id)),
-    [customAds, removedAds]);
+    () => [...customAds, ...serverAds, ...DEFAULT_ADS].filter((a) => !removedAds.includes(a.id)),
+    [customAds, serverAds, removedAds]);
 
   const value: StoreShape = {
     theme, toggleTheme: () => setTheme((t) => (t === "light" ? "dark" : "light")),
     identity, setIdentity, toasts, toast,
-    messagesFor, sendMessage, deleteMessage, reportMessage,
+    messagesFor, sendMessage, deleteMessage, reportMessage, hydrateFromServer,
     announcements,
-    addAnnouncement: (a) => { const full = { ...a, id: `ca-${Date.now()}` }; setCustomAnn((c) => { const n = [full, ...c]; ls.set("huec:announcements", n); return n; }); },
-    removeAnnouncement: (id) => setRemovedAnn((c) => { const n = [...c, id]; ls.set("huec:ann-rm", n); return n; }),
+    addAnnouncement: (a) => {
+      const full = { ...a, id: `ca-${Date.now()}` };
+      setCustomAnn((c) => { const n = [full, ...c]; ls.set("huec:announcements", n); return n; });
+      serverWrite(() => api.createAnnouncement(a));
+    },
+    removeAnnouncement: (id) => {
+      setRemovedAnn((c) => { const n = [...c, id]; ls.set("huec:ann-rm", n); return n; });
+      serverWrite(() => api.remove("announcements", id));
+    },
     ads,
-    addAd: (a) => { const full = { ...a, id: `cad-${Date.now()}` }; setCustomAds((c) => { const n = [full, ...c]; ls.set("huec:ads", n); return n; }); },
-    removeAd: (id) => setRemovedAds((c) => { const n = [...c, id]; ls.set("huec:ads-rm", n); return n; }),
+    addAd: (a) => {
+      const full = { ...a, id: `cad-${Date.now()}` };
+      setCustomAds((c) => { const n = [full, ...c]; ls.set("huec:ads", n); return n; });
+      serverWrite(() => api.createAd(a));
+    },
+    removeAd: (id) => {
+      setRemovedAds((c) => { const n = [...c, id]; ls.set("huec:ads-rm", n); return n; });
+      serverWrite(() => api.remove("ads", id));
+    },
     searchOpen, setSearchOpen,
   };
 

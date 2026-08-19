@@ -1,0 +1,129 @@
+// Hawassa University Exams & Courses — database schema
+// Provider: PostgreSQL (Neon / Supabase / Render Postgres)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  OWNER   // full admin (seeded account)
+  STAFF   // content moderators / uploaders
+  STUDENT // regular registered user
+}
+
+model User {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  email        String?  @unique
+  passwordHash String
+  name         String
+  role         Role     @default(STUDENT)
+  createdAt    DateTime @default(now())
+}
+
+/// One published exam paper. `questions` is a JSON array of
+/// { q, o: string[4], a: number, e?: string }.
+model Exam {
+  id         String   @id @default(cuid())
+  entityId   String // freshman subject id or department id
+  title      String
+  course     String
+  courseCode String
+  type       String // Midterm | Final | Quiz | Exit Exam
+  year       String // e.g. "2017 E.C."
+  gYear      String // gregorian label
+  semester   String
+  duration   String
+  marks      Int
+  hasAnswers Boolean  @default(false)
+  questions  Json
+  createdAt  DateTime @default(now())
+
+  @@index([entityId])
+}
+
+model Course {
+  id          String   @id @default(cuid())
+  entityId    String
+  code        String
+  title       String
+  credits     Int
+  semester    String
+  level       String
+  description String
+  topics      Json
+  createdAt   DateTime @default(now())
+
+  @@index([entityId])
+}
+
+/// Documents / notes / PDFs / materials / syllabi.
+/// `fileData` optionally stores the uploaded file as base64.
+model Document {
+  id        String   @id @default(cuid())
+  entityId  String
+  title     String
+  kind      String // Document | Note | PDF | Material | Syllabus
+  course    String
+  pages     Int
+  size      String
+  updated   String
+  fileName  String?
+  fileData  String?  @db.Text
+  createdAt DateTime @default(now())
+
+  @@index([entityId])
+}
+
+/// Exam photos & answer-sheet scans uploaded by the owner.
+/// `src` is a base64 data-URL (downscaled client-side before upload).
+model Photo {
+  id        String   @id @default(cuid())
+  entityId  String
+  src       String   @db.Text
+  caption   String
+  tag       String
+  createdAt DateTime @default(now())
+
+  @@index([entityId])
+}
+
+model Announcement {
+  id        String   @id @default(cuid())
+  date      String
+  title     String
+  body      String
+  tag       String
+  createdAt DateTime @default(now())
+}
+
+model Ad {
+  id        String   @id @default(cuid())
+  eyebrow   String
+  title     String
+  body      String
+  cta       String
+  link      String
+  offer     String?
+  image     String?
+  tone      String // pine | gold | night
+  createdAt DateTime @default(now())
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  room      String // "general" or an entity id
+  author    String
+  text      String
+  time      BigInt // epoch ms
+  replyTo   Json?
+  reported  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([room, time])
+}

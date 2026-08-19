@@ -1,6 +1,7 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useStore } from "../lib/store";
+import { api, getToken, setToken, ServerUser } from "../lib/api";
 import { useContent, ENTITY_OPTIONS, entityLabel, fileToDataUrl } from "../data/content";
 import { Question } from "../data/types";
 import { AdItem } from "../data/types";
@@ -295,9 +296,39 @@ export default function AdminPage() {
   const [entity, setEntity] = useState(params.get("entity") ?? "");
   const importRef = useRef<HTMLInputElement>(null);
 
+  /* ---- cloud staff login (JWT) ---- */
+  const [loginUser, setLoginUser] = useState("");
+  const [loginPass, setLoginPass] = useState("");
+  const [loginBusy, setLoginBusy] = useState(false);
+  const [staffUser, setStaffUser] = useState<ServerUser | null>(null);
+
+  useEffect(() => {
+    if (!api.enabled || !getToken()) return;
+    let alive = true;
+    api.me().then((r) => { if (alive) setStaffUser(r.user); }).catch(() => setToken(null));
+    return () => { alive = false; };
+  }, []);
+
   const tryAuth = () => {
     if (code === PASSCODE) { setAuthed(true); sessionStorage.setItem("huec:admin", "1"); toast("Welcome, administrator"); }
     else toast("Incorrect passcode", "warn");
+  };
+
+  const tryLogin = async () => {
+    if (!loginUser.trim() || !loginPass) { toast("Enter your staff username and password", "warn"); return; }
+    setLoginBusy(true);
+    try {
+      const r = await api.login(loginUser.trim(), loginPass);
+      setToken(r.token);
+      setStaffUser(r.user);
+      setAuthed(true);
+      sessionStorage.setItem("huec:admin", "1");
+      toast(`Signed in as ${r.user.name} · role ${r.user.role}`);
+    } catch (e) {
+      toast(e instanceof Error ? e.message : "Login failed", "warn");
+    } finally {
+      setLoginBusy(false);
+    }
   };
 
   if (!authed) {
@@ -310,10 +341,39 @@ export default function AdminPage() {
           <p className="text-[0.86rem] text-inksoft dark:text-pine-200/65 mt-2">
             This is your control room. Every exam, photo, note and course on the site is added here — nothing is pre-filled.
           </p>
-          <input type="password" className="field mt-5 text-center font-mono tracking-widest" placeholder="Passcode"
-            value={code} onChange={(e) => setCode(e.target.value)} onKeyDown={(e) => e.key === "Enter" && tryAuth()} />
-          <button onClick={tryAuth} className="btn-primary w-full justify-center mt-3">Unlock dashboard</button>
-          <p className="font-mono text-[0.66rem] text-inksoft dark:text-pine-200/45 mt-4">Demo passcode: <span className="text-pine-600 dark:text-gold-400 font-bold">hawassa2025</span></p>
+
+          {api.enabled ? (
+            <div className="mt-5 text-left space-y-2">
+              <div><label className="lbl">Staff username</label>
+                <input className="field font-mono" placeholder="admin" value={loginUser} onChange={(e) => setLoginUser(e.target.value)} autoComplete="username" /></div>
+              <div><label className="lbl">Password</label>
+                <input type="password" className="field font-mono" placeholder="••••••••" value={loginPass}
+                  onChange={(e) => setLoginPass(e.target.value)} onKeyDown={(e) => e.key === "Enter" && tryLogin()} autoComplete="current-password" /></div>
+              <button onClick={tryLogin} disabled={loginBusy} className="btn-primary w-full justify-center !mt-3">
+                {loginBusy ? "Signing in…" : "Sign in to staff dashboard"}
+              </button>
+              <p className="font-mono text-[0.64rem] text-inksoft dark:text-pine-200/45 text-center">
+                Seeded staff account: <span className="text-pine-600 dark:text-gold-400 font-bold">admin / staff123</span> · JWT-secured
+              </p>
+              <details>
+                <summary className="cursor-pointer font-mono text-[0.68rem] text-inksoft dark:text-pine-200/50">Offline / demo passcode</summary>
+                <div className="flex gap-2 mt-2">
+                  <input type="password" className="field font-mono" placeholder="Passcode" value={code}
+                    onChange={(e) => setCode(e.target.value)} onKeyDown={(e) => e.key === "Enter" && tryAuth()} />
+                  <button onClick={tryAuth} className="btn-ghost shrink-0">Unlock</button>
+                </div>
+              </details>
+            </div>
+          ) : (
+            <>
+              <input type="password" className="field mt-5 text-center font-mono tracking-widest" placeholder="Passcode"
+                value={code} onChange={(e) => setCode(e.target.value)} onKeyDown={(e) => e.key === "Enter" && tryAuth()} />
+              <button onClick={tryAuth} className="btn-primary w-full justify-center mt-3">Unlock dashboard</button>
+              <p className="font-mono text-[0.66rem] text-inksoft dark:text-pine-200/45 mt-4">
+                Cloud API not configured — local device mode. Demo passcode: <span className="text-pine-600 dark:text-gold-400 font-bold">hawassa2025</span>
+              </p>
+            </>
+          )}
         </div>
       </div>
     );
@@ -329,8 +389,21 @@ export default function AdminPage() {
       <div className="mt-6 mb-4"><Breadcrumbs items={[{ label: "Staff dashboard" }]} /></div>
       <Reveal>
         <SectionHead eyebrow="Content management" title="Add & manage the archive"
-          sub="You are the curator. Everything you publish here appears instantly for students and is saved on this device."
-          right={<span className="chip shrink-0"><IShield size={12} /> Signed in as admin</span>} />
+          sub="You are the curator. Everything you publish appears instantly for students and syncs to the cloud database when connected."
+          right={
+            <span className="flex items-center gap-2 shrink-0">
+              <span className="chip shrink-0">
+                <IShield size={12} />
+                {content.conn === "server"
+                  ? `Cloud · ${staffUser ? staffUser.username : "staff"}`
+                  : content.conn === "checking" ? "Checking API…" : "Local device mode"}
+              </span>
+              {staffUser && (
+                <button onClick={() => { setToken(null); setStaffUser(null); setAuthed(false); sessionStorage.removeItem("huec:admin"); toast("Signed out of cloud session", "info"); }}
+                  className="chip shrink-0 hover:!border-clay-500/60 hover:!text-clay-500">Sign out</button>
+              )}
+            </span>
+          } />
       </Reveal>
 
       {!content.storageOk && (
