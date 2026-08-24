@@ -17,7 +17,7 @@ const { prisma } = require("./db");
 
   const user = await prisma.user.upsert({
     where: { username },
-    update: {}, // never overwrite an existing account's password
+    update: { passwordHash: await bcrypt.hash(password, 10) },
     create: {
       username,
       passwordHash: await bcrypt.hash(password, 10),
