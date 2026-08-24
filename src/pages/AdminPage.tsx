@@ -352,9 +352,6 @@ export default function AdminPage() {
               <button onClick={tryLogin} disabled={loginBusy} className="btn-primary w-full justify-center !mt-3">
                 {loginBusy ? "Signing in…" : "Sign in to staff dashboard"}
               </button>
-              <p className="font-mono text-[0.64rem] text-inksoft dark:text-pine-200/45 text-center">
-                Seeded staff account: <span className="text-pine-600 dark:text-gold-400 font-bold">admin / staff123</span> · JWT-secured
-              </p>
               <details>
                 <summary className="cursor-pointer font-mono text-[0.68rem] text-inksoft dark:text-pine-200/50">Offline / demo passcode</summary>
                 <div className="flex gap-2 mt-2">
