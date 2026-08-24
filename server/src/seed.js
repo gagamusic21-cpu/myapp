@@ -13,7 +13,7 @@ const { prisma } = require("./db");
 
 (async () => {
   const username = (process.env.SEED_ADMIN_USERNAME || "admin").toLowerCase();
-  const password = process.env.SEED_ADMIN_PASSWORD || "staff123";
+  const password = process.env.SEED_ADMIN_PASSWORD || "@HAWASSA0$$$123";
 
   const user = await prisma.user.upsert({
     where: { username },
