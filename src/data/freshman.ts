@@ -22,7 +22,7 @@ export const FRESHMAN_SUBJECTS: FreshmanSubject[] = [
     tagline: "Reason well: arguments, validity and fallacies.",
     overview: "This course trains students to distinguish good reasoning from bad. It covers the structure of arguments, deductive and inductive logic, and the informal fallacies that weaken everyday debate.",
     topics: ["Nature of Logic & Argument", "Deduction vs Induction", "Categorical Propositions", "Propositional Logic", "Informal Fallacies", "Critical Thinking in Media"],
-    image: IMG.lectureHall,
+    image: IMG.logic,
     questions: [
       mq("An argument is valid when…", ["Its premises are true", "If the premises were true the conclusion must be true", "Its conclusion is popular", "It persuades the audience"], 1, "Validity concerns structure: truth of premises guarantees the conclusion."),
       mq("'All humans are mortal. Socrates is human. Therefore Socrates is mortal.' This is…", ["Inductive reasoning", "A deductive syllogism", "A fallacy", "An analogy"], 1, "It is a classic categorical syllogism — deductive."),
@@ -36,7 +36,7 @@ export const FRESHMAN_SUBJECTS: FreshmanSubject[] = [
     tagline: "Calculus, algebra and the language of science.",
     overview: "Freshman mathematics covers the essential toolkit for all science and engineering streams: sets and functions, limits and continuity, differential and integral calculus, and an introduction to vectors and matrices.",
     topics: ["Sets, Relations & Functions", "Limits & Continuity", "Derivatives & Applications", "Integration Techniques", "Sequences & Series", "Matrices & Determinants"],
-    image: IMG.lectureHall,
+    image: IMG.maths,
     questions: [
       mq("Solve for x: 2x + 6 = 0", ["x = 3", "x = −3", "x = 6", "x = −6"], 1, "2x = −6, so x = −3."),
       mq("The derivative of f(x) = x² is…", ["2x", "x", "x²/2", "2"], 0, "By the power rule d/dx(xⁿ) = n·xⁿ⁻¹."),
@@ -50,7 +50,7 @@ export const FRESHMAN_SUBJECTS: FreshmanSubject[] = [
     tagline: "Foundation skills in academic reading, writing and speaking.",
     overview: "The first semester of communicative English develops core academic skills: sentence structure, paragraph writing, reading for main ideas, listening for gist and everyday spoken interaction.",
     topics: ["Sentence Structure & Concord", "Paragraph Development", "Reading for Main Ideas", "Listening for Gist", "Vocabulary Building", "Everyday Conversations"],
-    image: IMG.lectureHall,
+    image: IMG.english1,
     questions: [
       mq("Choose the correct sentence.", ["Each of the students have a book.", "Each of the students has a book.", "Each of the student has books.", "Each students has a book."], 1, "'Each' is singular and takes a singular verb."),
       mq("A paragraph's topic sentence should…", ["Appear only at the end", "State the main idea clearly", "Contain every detail", "Avoid the subject"], 1, "The topic sentence announces the controlling idea of the paragraph."),
@@ -64,7 +64,7 @@ export const FRESHMAN_SUBJECTS: FreshmanSubject[] = [
     tagline: "Advanced composition, argumentation and academic discourse.",
     overview: "The second semester moves students toward full academic literacy: essay composition, argumentative writing, formal presentation skills, and the conventions of academic texts and correspondence.",
     topics: ["Essay Types & Structure", "Argument & Persuasion", "Passive & Reported Speech", "Formal Letters & Memos", "Presentation Skills", "Interpreting Academic Texts"],
-    image: IMG.lectureHall,
+    image: IMG.english2,
     questions: [
       mq("'The experiment was conducted by the team.' This sentence is in…", ["Active voice", "Passive voice", "Reported speech", "Imperative mood"], 1, "The subject receives the action — passive voice."),
       mq("Which connective best signals contrast?", ["Moreover", "However", "Therefore", "Furthermore"], 1, "'However' introduces a contrasting idea."),
@@ -78,7 +78,7 @@ export const FRESHMAN_SUBJECTS: FreshmanSubject[] = [
     tagline: "AI, IoT, cloud and the technologies reshaping work.",
     overview: "A survey course on the digital forces transforming Ethiopia and the world: artificial intelligence, the Internet of Things, cloud computing, big data and the ethics of a connected society.",
     topics: ["Introduction to Emerging Tech", "Artificial Intelligence & ML", "Internet of Things", "Cloud & Edge Computing", "Big Data Analytics", "Digital Ethics & Society"],
-    image: IMG.iotLab,
+    image: IMG.emerging,
     questions: [
       mq("Which technology allows machines to learn patterns from data?", ["Blockchain", "Machine learning", "3D printing", "GPS"], 1, "Machine learning builds models from data rather than explicit rules."),
       mq("'IoT' stands for…", ["Internet of Tools", "Internet of Things", "Input of Technology", "Integration of Telephony"], 1, "The Internet of Things connects physical devices to networks."),
@@ -92,7 +92,7 @@ export const FRESHMAN_SUBJECTS: FreshmanSubject[] = [
     tagline: "Mechanics, energy and the physical world measured.",
     overview: "General physics for freshmen covers kinematics, Newtonian dynamics, work and energy, waves and an introduction to electricity — with laboratory work that builds experimental skill.",
     topics: ["Units, Vectors & Kinematics", "Newton's Laws of Motion", "Work, Energy & Power", "Momentum & Collisions", "Waves & Sound", "Electrostatics Basics"],
-    image: IMG.iotLab,
+    image: IMG.physics,
     questions: [
       mq("The SI unit of force is the…", ["Joule", "Newton", "Watt", "Pascal"], 1, "Force is measured in newtons (kg·m/s²)."),
       mq("An object in uniform motion stays in motion unless acted on by a force. This is Newton's…", ["First law", "Second law", "Third law", "Law of gravitation"], 0, "The law of inertia is Newton's first law."),
@@ -106,7 +106,7 @@ export const FRESHMAN_SUBJECTS: FreshmanSubject[] = [
     tagline: "Health, movement and lifelong fitness habits.",
     overview: "The physical education course combines practical activity with health science: components of fitness, training principles, nutrition basics and habits that support academic performance.",
     topics: ["Components of Physical Fitness", "Warm-up & Cool-down", "FITT Training Principles", "Nutrition Basics", "Injury Prevention", "Stress & Exercise"],
-    image: IMG.campus,
+    image: IMG.sport,
     questions: [
       mq("Which is a health-related component of fitness?", ["Cardiovascular endurance", "Reaction time", "Agility", "Balance"], 0, "Cardio-respiratory endurance is one of the five health-related components."),
       mq("The main purpose of a warm-up is to…", ["Tire the muscles", "Prepare the body and reduce injury risk", "Replace stretching", "Burn maximum calories"], 1, "Warm-ups raise body temperature and prepare muscles and joints."),
@@ -120,7 +120,7 @@ export const FRESHMAN_SUBJECTS: FreshmanSubject[] = [
     tagline: "Evidence, interpretation and the making of societies.",
     overview: "Freshman history develops skills in using sources and interpreting change over time, from early human origins in the Horn of Africa to the formation of the modern Ethiopian state and the contemporary world.",
     topics: ["Sources & Methods of History", "Early Humans in the Horn", "Ancient Civilizations", "Medieval Ethiopian Kingdoms", "The Battle of Adwa & Its Legacy", "The Modern World System"],
-    image: IMG.lectureHall,
+    image: IMG.history,
     questions: [
       mq("Which is a primary source for historians?", ["A textbook chapter", "A royal inscription from the period", "A documentary film", "A modern lecture"], 1, "Primary sources originate from the period under study."),
       mq("The earliest known civilization of Mesopotamia was the…", ["Roman", "Sumerian", "Mayan", "Han"], 1, "Sumer developed writing and cities from c. 3500 BCE."),
@@ -134,7 +134,7 @@ export const FRESHMAN_SUBJECTS: FreshmanSubject[] = [
     tagline: "Landscapes, climate and human–environment systems.",
     overview: "The course surveys physical and human geography: earth systems, climate, population, settlement and the distinctive landscapes of Ethiopia, including the Great Rift Valley system.",
     topics: ["Scope of Geography", "Earth Structure & Landforms", "Climate & Weather Systems", "Population & Migration", "The Ethiopian Rift Valley", "Maps, Scale & GIS Basics"],
-    image: IMG.campus,
+    image: IMG.geography,
     questions: [
       mq("Weather differs from climate because climate is…", ["Day-to-day conditions", "Long-term average conditions", "Only rainfall", "Only temperature"], 1, "Climate describes average patterns over decades."),
       mq("The Great Rift Valley in Ethiopia is a product of…", ["Glaciation", "Tectonic plate divergence", "River erosion alone", "Volcanic ash only"], 1, "The Rift formed as the Arabian and African plates diverge."),
@@ -148,7 +148,7 @@ export const FRESHMAN_SUBJECTS: FreshmanSubject[] = [
     tagline: "Atoms, bonding and the reactions behind matter.",
     overview: "General chemistry builds from atomic structure and the periodic table through bonding, stoichiometry, states of matter and an introduction to organic chemistry, with weekly laboratory sessions.",
     topics: ["Atomic Structure", "Periodic Trends", "Chemical Bonding", "Stoichiometry & Mole Concept", "States of Matter & Solutions", "Intro to Organic Chemistry"],
-    image: IMG.medLab,
+    image: IMG.chemistry,
     questions: [
       mq("The atomic number of an element equals its number of…", ["Neutrons", "Protons", "Nucleons", "Ions"], 1, "Atomic number Z counts protons in the nucleus."),
       mq("A solution with pH 7 is…", ["Acidic", "Basic", "Neutral", "Buffered"], 2, "Pure water at 25 °C has pH 7 — neutral."),
@@ -162,7 +162,7 @@ export const FRESHMAN_SUBJECTS: FreshmanSubject[] = [
     tagline: "From cells and genetics to ecosystems.",
     overview: "Freshman biology explores the unity and diversity of life: cell structure, metabolism, genetics and evolution, and the ecology of organisms — the foundation for all health and life sciences.",
     topics: ["Cell Theory & Structure", "Photosynthesis & Respiration", "Genetics & Inheritance", "Evolution & Classification", "Human Body Systems", "Ecology & Ecosystems"],
-    image: IMG.medLab,
+    image: IMG.biology,
     questions: [
       mq("The basic structural and functional unit of life is the…", ["Tissue", "Organ", "Cell", "Organism"], 2, "Cell theory identifies the cell as life's basic unit."),
       mq("Photosynthesis takes place in the…", ["Mitochondrion", "Chloroplast", "Nucleus", "Ribosome"], 1, "Chloroplasts capture light energy to build sugars."),
@@ -176,7 +176,7 @@ export const FRESHMAN_SUBJECTS: FreshmanSubject[] = [
     tagline: "Globalization, sustainability and our connected century.",
     overview: "This interdisciplinary course examines the forces shaping the 21st century: globalization, demographic change, climate action and the Sustainable Development Goals, and what they mean for Ethiopia.",
     topics: ["Globalization & Interconnection", "Population & Urbanization", "Climate Change & Sustainability", "The SDGs Agenda 2030", "Digital Divides", "Global Governance"],
-    image: IMG.campus,
+    image: IMG.global,
     questions: [
       mq("Globalization primarily refers to…", ["Growing interconnection of economies, cultures and people", "National isolation", "Local farming only", "Military alliances only"], 0, "Globalization describes intensifying worldwide linkages."),
       mq("The UN 2030 Agenda contains how many SDGs?", ["8", "12", "17", "21"], 2, "Seventeen Sustainable Development Goals were adopted in 2015."),
@@ -190,7 +190,7 @@ export const FRESHMAN_SUBJECTS: FreshmanSubject[] = [
     tagline: "First principles of programming with C++.",
     overview: "Students learn computational thinking and the C++ language: variables and types, control flow, functions, arrays and pointers, with weekly lab assignments building small working programs.",
     topics: ["Introduction to Programming", "Variables & Data Types", "Control Flow & Loops", "Functions & Scope", "Arrays & Pointers", "Structs & File I/O"],
-    image: IMG.iotLab,
+    image: IMG.computer,
     questions: [
       mq("Which of the following is NOT a C++ keyword?", ["return", "variable", "while", "if"], 1, "'variable' is not reserved; the others are keywords."),
       mq("Which data type stores whole numbers?", ["float", "char", "int", "bool"], 2, "int stores integers."),
@@ -204,7 +204,7 @@ export const FRESHMAN_SUBJECTS: FreshmanSubject[] = [
     tagline: "Mind, behaviour and the science of experience.",
     overview: "An introduction to the scientific study of mind and behaviour: research methods, brain and behaviour, learning, memory, development and personality, with attention to mental health awareness.",
     topics: ["Foundations & Methods", "Brain & Behaviour", "Learning & Conditioning", "Memory & Cognition", "Development Across the Lifespan", "Personality & Mental Health"],
-    image: IMG.lectureHall,
+    image: IMG.psychology,
     questions: [
       mq("Psychology is scientifically defined as the study of…", ["Mind and behaviour", "Only mental illness", "The brain's anatomy", "Social groups"], 0, "Psychology studies both mental processes and observable behaviour."),
       mq("Ivan Pavlov is associated with…", ["Operant conditioning", "Classical conditioning", "Psychoanalysis", "Humanism"], 1, "Pavlov's dogs demonstrated classical (associative) conditioning."),
@@ -218,7 +218,7 @@ export const FRESHMAN_SUBJECTS: FreshmanSubject[] = [
     tagline: "From opportunity recognition to venture creation.",
     overview: "The course introduces entrepreneurship as a mindset and practice: opportunity recognition, business planning, basic finance and marketing, and the role of small enterprise in the Ethiopian economy.",
     topics: ["The Entrepreneurial Mindset", "Opportunity Recognition", "Business Model & Planning", "Marketing Basics", "Sources of Startup Finance", "SMEs in Ethiopia"],
-    image: IMG.lectureHall,
+    image: IMG.enter,
     questions: [
       mq("An entrepreneur is best described as someone who…", ["Avoids all risk", "Identifies opportunities and organizes resources under risk", "Only inherits businesses", "Works only for the government"], 1, "Entrepreneurs combine opportunity, resources and calculated risk."),
       mq("A business plan primarily…", ["Guarantees profit", "Maps the venture's strategy, market and finances", "Replaces marketing", "Is only for banks"], 1, "It is a strategic roadmap used with investors, banks and teams."),
@@ -232,7 +232,7 @@ export const FRESHMAN_SUBJECTS: FreshmanSubject[] = [
     tagline: "Mathematical methods for applied disciplines.",
     overview: "Applied Mathematics I equips students in applied fields with working methods: linear equations and matrices, functions and graphs, introductory calculus of one variable, and modelling with real data.",
     topics: ["Linear Equations & Matrices", "Functions & Graphs", "Limits in Application", "Differentiation & Rates", "Optimization Problems", "Mathematical Modelling"],
-    image: IMG.lectureHall,
+    image: IMG.applied1,
     questions: [
       mq("The slope of the line y = 3x + 5 is…", ["5", "3", "8", "x"], 1, "In y = mx + c, the slope m = 3."),
       mq("A rate of change of a quantity is modelled by the…", ["Integral", "Derivative", "Mean", "Determinant"], 1, "Derivatives measure instantaneous rates of change."),
@@ -246,7 +246,7 @@ export const FRESHMAN_SUBJECTS: FreshmanSubject[] = [
     tagline: "Scarcity, choice and how markets allocate resources.",
     overview: "Introduction to micro- and macroeconomics: supply and demand, consumer and producer behaviour, market structures, national income, money, inflation and the role of policy in development.",
     topics: ["Scarcity & Choice", "Demand, Supply & Equilibrium", "Elasticity", "Production & Costs", "Market Structures", "National Income & Inflation"],
-    image: IMG.lectureHall,
+    image: IMG.economy,
     questions: [
       mq("The fundamental economic problem is…", ["Too much money", "Scarcity relative to unlimited wants", "High taxes", "Unemployment only"], 1, "Resources are limited while human wants are unlimited."),
       mq("When the price of a good rises, quantity demanded typically…", ["Rises", "Falls", "Is unchanged", "Becomes infinite"], 1, "The law of demand: price and quantity demanded move oppositely."),
@@ -260,7 +260,7 @@ export const FRESHMAN_SUBJECTS: FreshmanSubject[] = [
     tagline: "Citizenship, ethics and democratic life.",
     overview: "The course examines the foundations of citizenship: the constitution, rule of law, democratic institutions, human rights and moral reasoning, preparing students for responsible participation in public life.",
     topics: ["Concepts of Citizenship", "The Constitution & Rule of Law", "Democracy & Institutions", "Human Rights & Duties", "Ethics & Moral Reasoning", "Anti-Corruption & Integrity"],
-    image: IMG.lectureHall,
+    image: IMG.moral,
     questions: [
       mq("Citizenship entails…", ["Rights only", "Both rights and responsibilities", "Paying no taxes", "Living abroad"], 1, "Citizens balance entitlements with civic duties."),
       mq("The 'rule of law' means…", ["Leaders are above the law", "Law governs everyone equally", "Courts serve the powerful", "Customs replace statutes"], 1, "No person or institution stands above the law."),
