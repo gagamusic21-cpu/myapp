@@ -116,7 +116,7 @@ export interface ChatMessage {
 
 export const IMG = {
   campus: "https://image.qwenlm.ai/generated-images/57b57658-f987-4b68-8f1b-e5d0a59c5dda/_result.png",
-  iotLab: "https://image.qwenlm.ai/generated-images/4babadf1-60e7-4bb8-9379-f2d1990113de/_result.png",
+  iotLab:"/images/iotphoto.webp",
   agriField: "https://image.qwenlm.ai/generated-images/1b5a3987-d510-4ed8-9c05-81abe8079789/_result.png",
   healthSim: "https://image.qwenlm.ai/generated-images/449a27ef-c3f9-4a47-9354-2adb2da2d86a/_result.png",
   lectureHall:"/images/freshman.webp",
