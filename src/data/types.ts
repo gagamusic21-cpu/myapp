@@ -122,5 +122,6 @@ export const IMG = {
   lectureHall: "https://image.qwenlm.ai/generated-images/41fd078c-7110-4d4a-ad4f-d61bbb302a28/_result.png",
   workshop: "https://image.qwenlm.ai/generated-images/49ea7afd-2179-4f23-a8cd-e458598680ee/_result.png",
   medLab: "https://image.qwenlm.ai/generated-images/059a50d6-329a-478b-9bb5-9a87e1a42221/_result.png",
-  construction: "https://image.qwenlm.ai/generated-images/75826a2e-9b39-4435-b101-0a44e9009076/_result.png",
+  construction: "https://image.qwenlm.ai/generated-images/75826a2e-9b39-4435-b101-0a44e9009076/_result.png", 
+  anthro: "/images/anthropology.jpg",
 };
