@@ -8,7 +8,7 @@ export const FRESHMAN_SUBJECTS: FreshmanSubject[] = [
     tagline: "The study of humans, culture and society across time.",
     overview: "Anthropology introduces students to the holistic study of humanity — biological evolution, culture, language and society. The course builds the foundation for understanding diversity, identity and social life in Ethiopia and beyond.",
     topics: ["Origins & Scope of Anthropology", "Human Evolution", "Culture & Cultural Variation", "Marriage, Family & Kinship", "Religion & Ritual", "Ethnicity & Identity in Ethiopia"],
-    image: IMG.lectureHall,
+    image: IMG.anthro,
     questions: [
       mq("Anthropology is best described as the study of…", ["Human societies and cultures holistically", "Only ancient civilizations", "Animal behaviour exclusively", "Political systems only"], 0, "Anthropology studies humans holistically — biology, culture, language and society."),
       mq("Which sub-field studies material remains of past peoples?", ["Cultural anthropology", "Archaeology", "Linguistics", "Ethnography"], 1, "Archaeology reconstructs past lifeways through material remains."),
