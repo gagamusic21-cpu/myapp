@@ -54,7 +54,7 @@ export const DEPARTMENTS: Department[] = [
     ["Circuits & Signals", "Digital Logic Design", "Control Systems", "Power Systems & Machines", "Embedded Systems", "Communication Systems"],
     ["Analyse and design analog and digital circuits", "Program microcontrollers and embedded platforms", "Model and control dynamic systems", "Plan generation, transmission and distribution of power", "Design wireless and wired communication links"],
     ["Electrical Engineer", "Embedded Systems Engineer", "Power Systems Engineer", "Telecommunications Engineer", "Control Engineer"],
-    [IMG.iotLab, IMG.workshop]),
+    ["/images/elec.jpg", IMG.workshop]),
   d("information-technology", "Information Technology", "IT", "iot",
     "Networks, cloud and the infrastructure of the internet age.",
     "The IT programme focuses on the practical technology that keeps organisations running: network administration, cloud and virtualisation, cybersecurity and IT service management, with extensive hands-on lab work.",
