@@ -121,7 +121,7 @@ export const IMG = {
   healthSim: "https://image.qwenlm.ai/generated-images/449a27ef-c3f9-4a47-9354-2adb2da2d86a/_result.png",
   lectureHall:"/images/freshman.webp",
   workshop: "https://image.qwenlm.ai/generated-images/49ea7afd-2179-4f23-a8cd-e458598680ee/_result.png",
-  medLab: "https://image.qwenlm.ai/generated-images/059a50d6-329a-478b-9bb5-9a87e1a42221/_result.png",
+  medLab:"/images/hcampus.webp",
   construction: "https://image.qwenlm.ai/generated-images/75826a2e-9b39-4435-b101-0a44e9009076/_result.png", 
   anthro: "/images/anthropology.jpg", 
   logic: "/images/logic.jpg",
